@@ -1,42 +1,29 @@
-const express = require('express');
-const path = require('path');
+const express = require('express')
+const path = require('path')
 const bodyParser = require('body-parser');
-const port = 3000;
-const multer = require('multer');
-const cors = require("cors");
-const { exec } = require('child_process');
-const { v4: uuidv4 } = require('uuid');
-const { Client } = require('ssh2');
-const util = require('util');
-const fs = require('fs');
+const port = 3000
+const multer = require('multer')
+const cors = require("cors")
+const { v4: uuidv4 } = require('uuid')
+const { Client } = require('ssh2')
+const fs = require('fs')
+const { executeCommand } = require('./handlers/command')
+const { fileStorageEngine } = require('./handlers/fileStore')
 
-const execPromise = util.promisify(exec);
+const app = express()
 
-const app = express();
-
-app.use(bodyParser.json());
-app.use(cors());
-
-const fileStorageEngine = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "./files");
-  },
-  filename: (req, file, cb) => {
-    cb(null, uuidv4() + "-" + file.originalname);
-  },
-});
+app.use(bodyParser.json())
+app.use(cors())
 
 const upload = multer({ storage: fileStorageEngine });
 
-// Define a route to handle file uploads
 app.post('/upload', upload.single('file'), (req, res) => {
-  // Access the uploaded files using req.files
+
   if (!req.file || req.file.length === 0) {
     console.log(req.files)
     return res.status(400).send('No files were uploaded.');
   }
 
-  // File upload success
   return res.json({
     message: "Files uploaded successfully",
     fileName: req.file.filename,
@@ -80,19 +67,6 @@ function executeSSHCommand(host, username, privateKeyPath, command) {
       reject(err);
     });
   });
-}
-
-async function executeCommand(command) {
-  try {
-    const { stdout, stderr } = await execPromise(command);
-    if (stderr) {
-      console.error(`stderr: ${stderr}`);
-      return;
-    }
-    console.log(`stdout:\n${stdout}`);
-  } catch (error) {
-    console.error(`Error: ${error.message}`);
-  }
 }
 
 
@@ -139,7 +113,6 @@ app.post('/repair', async (req, res) => {
 
   await runSSHCommand(`${java} -jar target/logmap-matcher-4.0.jar DEBUGGER ${onto1Path} ${onto2Path} TXT /usr/src/app/logmap-matcher/mymappings.txt ${outputPath} false true`)
 
-  console.log(`>> zipping output`);
   await runSSHCommand(`cd ../out && zip -r ${requestId}.zip ${requestId}`);
 
   await executeCommand(
@@ -152,35 +125,18 @@ app.post('/repair', async (req, res) => {
   `);
 })
 
-function executeJarCommand() {
-  return new Promise((resolve, reject) => {
-    const filename = 'Koon1.txt';
-    const jarCommand = `java -jar FileCreator.jar ${filename} xxxx`;
-    exec(jarCommand, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Error executing JAR file: ${error.message}`);
-        reject(error); // Reject the promise if an error occurred
-        return;
-      }
-
-      console.log('JAR file executed successfully!');
-      console.log('Standard Output:', stdout);
-      // console.error('Standard Error:', stderr);
-
-      resolve(stdout); // Resolve the promise with the stdout value
-    });
-  });
-}
-
 app.get('/download', async (req, res) => {
   try {
-    const xxx = await executeJarCommand();
-    console.log('Returned Standard Output:', xxx);
 
-    const filePath = path.join(__dirname, 'files', xxx); // Assuming xxx contains the filename
+    const { requestId } = req.body
+    if (!requestId) {
+      return res.status(400).send('RequestId is missing');
+    }
+
+    const filePath = path.join(__dirname, 'outputs', requestId + '.zip'); // Assuming xxx contains the filename
     console.log('File Path:', filePath);
-    const abc = '/Users/krerkkiathemadhulin/Documents/city/Project/KnowledgeGraphAlignmentRepairAsAService/files/Koon.txt'
-    res.download(abc, (err) => {
+    // const abc = '/Users/krerkkiathemadhulin/Documents/city/Project/KnowledgeGraphAlignmentRepairAsAService/files/Koon.txt'
+    res.download(filePath, (err) => {
       if (err) {
         console.error('Error downloading file:', err);
         return res.status(500).send('Error downloading file');
