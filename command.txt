@@ -2,3 +2,5 @@ javac FileCreator.java
 jar cfm FileCreator.jar Manifest.txt FileCreator.class
 
 java -jar logmap-matcher-4.0.jar DEBUGGER /Users/krerkkiathemadhulin/Documents/city/Project/logmap-matcher-standalone-july-2021/cmt.owl /Users/krerkkiathemadhulin/Documents/city/Project/logmap-matcher-standalone-july-2021/ekaw.owl RDF mymappings.rdf output false true
+
+docker build -f logmap-dockerfile -t logmap .
