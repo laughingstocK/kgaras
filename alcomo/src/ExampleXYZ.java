@@ -101,7 +101,7 @@ public class ExampleXYZ {
 		System.out.println("after debugging (pre, rec, f):  " + cAfter.toShortDesc());
 
 		try {
-            FileWriter fileWriter = new FileWriter(requestId + ".txt");
+            FileWriter fileWriter = new FileWriter("/usr/src/app/out/" + requestId + "/" + requestId + ".txt");
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
 			bufferedWriter.write("thresholded input mapping has " + mapping.size() + " correspondences" + "\n");

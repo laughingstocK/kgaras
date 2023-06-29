@@ -32,10 +32,14 @@ app.post('/upload', upload.single('file'), (req, res) => {
 })
 
 app.post('/repair', async (req, res) => {
-  const { ontologyId1, ontologyId2 } = req.body
+  const { ontologyId1, ontologyId2, alignId, refId, service } = req.body
 
   if (!ontologyId1 || !ontologyId2) {
     return res.status(400).send('OntologyId1 or ontologyId2 is missing');
+  }
+
+  if (!service) {
+    return res.status(400).send('Service is required');
   }
 
   const requestId = uuidv4()
@@ -45,31 +49,59 @@ app.post('/repair', async (req, res) => {
   })
 
   await runSSHCommand(`mkdir /usr/src/app/data/${requestId} && \
-                       mkdir /usr/src/app/out/${requestId}`)
+                       mkdir /usr/src/app/out/${requestId}`, service)
 
-  await executeCommand(
-    `scp ./files/${ontologyId1} ${sshUser}@${logmapUrl}:/usr/src/app/data/${requestId} && \
-     scp ./files/${ontologyId2} ${sshUser}@${logmapUrl}:/usr/src/app/data/${requestId} 
-    `,
-  );
+  if (service == 'logmap') {
+    await executeCommand(
+      `scp -P 22 ./files/${ontologyId1} ${sshUser}@${logmapUrl}:/usr/src/app/data/${requestId} && \
+       scp -P 22 ./files/${ontologyId2} ${sshUser}@${logmapUrl}:/usr/src/app/data/${requestId} && \
+       scp -P 22 ./files/${alignId} ${sshUser}@${logmapUrl}:/usr/src/app/data/${requestId}
+      `,
+    );
 
-  const java = '/opt/ibm/java/bin/java'
-  const onto1Path = `file:/usr/src/app/data/${requestId}/${ontologyId1}`
-  const onto2Path = `file:/usr/src/app/data/${requestId}/${ontologyId2}`
-  const outputPath = `/usr/src/app/out/${requestId}`
+    const java = '/opt/ibm/java/bin/java'
+    const onto1Path = `file:/usr/src/app/data/${requestId}/${ontologyId1}`
+    const onto2Path = `file:/usr/src/app/data/${requestId}/${ontologyId2}`
+    const alignPath = `/usr/src/app/data/${requestId}/${alignId}`
+    const outputPath = `/usr/src/app/out/${requestId}`
 
-  await runSSHCommand(`${java} -jar target/logmap-matcher-4.0.jar DEBUGGER ${onto1Path} ${onto2Path} TXT /usr/src/app/logmap-matcher/mymappings.txt ${outputPath} false true`)
+    await runSSHCommand(`${java} -jar target/logmap-matcher-4.0.jar DEBUGGER ${onto1Path} ${onto2Path} RDF ${alignPath} ${outputPath} false true`, service)
 
-  await runSSHCommand(`cd ../out && zip -r ${requestId}.zip ${requestId}`);
+    await runSSHCommand(`cd ../out && zip -r ${requestId}.zip ${requestId}`, service);
 
-  await executeCommand(
-    `scp ${sshUser}@${logmapUrl}:/usr/src/app/out/${requestId}.zip ./outputs`,
-  )
+    await executeCommand(
+      `scp -P 22 ${sshUser}@${logmapUrl}:/usr/src/app/out/${requestId}.zip ./outputs`,
+    )
+
+  } else if (service == 'alcomo') {
+    await executeCommand(
+      `scp -P 23 ./files/${ontologyId1} ${sshUser}@${logmapUrl}:/usr/src/app/data/${requestId} && \
+       scp -P 23 ./files/${ontologyId2} ${sshUser}@${logmapUrl}:/usr/src/app/data/${requestId} && \
+       scp -P 23 ./files/${alignId} ${sshUser}@${logmapUrl}:/usr/src/app/data/${requestId} && \
+       scp -P 23 ./files/${refId} ${sshUser}@${logmapUrl}:/usr/src/app/data/${requestId}
+      `,
+    );
+
+    const java = '/usr/bin/java'
+    const onto1Path = `/usr/src/app/data/${requestId}/${ontologyId1}`
+    const onto2Path = `/usr/src/app/data/${requestId}/${ontologyId2}`
+    const alignPath = `/usr/src/app/data/${requestId}/${alignId}`
+    const refPath = `/usr/src/app/data/${requestId}/${refId}`
+
+    await runSSHCommand(`${java} -cp dist/alcomo.jar ExampleXYZ "${requestId}" "${onto1Path}" "${onto2Path}" "${alignPath}" "${refPath}"`, service)
+
+    await runSSHCommand(`cd ../out && zip -r ${requestId}.zip ${requestId}`, service);
+
+    await executeCommand(
+      `scp -P 23 ${sshUser}@${logmapUrl}:/usr/src/app/out/${requestId}.zip ./outputs`,
+    )
+
+  }
 
   await runSSHCommand(`
   rm -rf /usr/src/app/out/${requestId} && \
   rm /usr/src/app/out/${requestId}.zip
-  `)
+  `, service)
 })
 
 app.get('/download', async (req, res) => {
@@ -94,7 +126,6 @@ app.get('/download', async (req, res) => {
   }
 })
 
-// Start the server
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 })
