@@ -1,0 +1,11 @@
+services:
+  logmap:
+    container_name: logmap
+    build:
+      context: ./logmap
+      dockerfile: logmap-dockerfile
+    ports:
+      - 22:22
+    # networks:
+    #   - logmap-network
+    platform: linux/amd64
