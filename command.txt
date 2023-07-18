@@ -4,3 +4,12 @@ jar cfm FileCreator.jar Manifest.txt FileCreator.class
 java -jar logmap-matcher-4.0.jar DEBUGGER /Users/krerkkiathemadhulin/Documents/city/Project/logmap-matcher-standalone-july-2021/cmt.owl /Users/krerkkiathemadhulin/Documents/city/Project/logmap-matcher-standalone-july-2021/ekaw.owl RDF mymappings.rdf output false true
 
 docker build -f logmap-dockerfile -t logmap .
+
+ssh -p 23 rob@localhost ls /usr/src/app
+code /Users/krerkkiathemadhulin/.ssh/known_hosts
+
+upload /Users/krerkkiathemadhulin/Documents/city/Project/KnowledgeGraphAlignmentRepairAsAService/data/ekaw.owl
+python3 test.py repair f1c74eb1-52a4-413a-90ca-b47be1f35efb-cmt.owl 1ac10a7c-716e-41f5-a9c3-9ce349b70d04-ekaw.owl 222797fa-621c-4954-81d2-64d3decbd772-csa-cmt-ekaw.rdf 3cfb9bcb-43ce-4736-97ea-0f988c87ad32-cmt-ekaw.rdf alcomo
+python3 test.py download b40b082f-51f5-499d-a9fa-b9b3f3bb9830
+c7a76281-326b-4b47-92e2-4b1f2816ac4b
+b40b082f-51f5-499d-a9fa-b9b3f3bb9830
