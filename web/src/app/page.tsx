@@ -43,23 +43,28 @@ const Home: React.FC = () => {
       alert('Please enter a download request ID');
       return;
     }
-  
+ 
     const downloadData = JSON.stringify({
       requestId: downloadReqId,
     });
-  
+    
     try {
-      const response = await axios.get('http://localhost:3001/download', {
+      const response = await axios.post('http://localhost:3001/download', downloadData, {
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        data: downloadData,
+        maxBodyLength: Infinity,
         responseType: 'blob',
       });
-      
       const downloadUrl = URL.createObjectURL(response.data);
       console.log('Download URL:', downloadUrl);
       // Process the download URL here or trigger a download
+      const downloadLink = document.createElement('a');
+      downloadLink.href = downloadUrl;
+      downloadLink.download =  downloadReqId + '.zip'; // Specify the desired file name
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink); 
     } catch (error) {
       console.error('Download error:', error);
     }
@@ -80,7 +85,7 @@ const Home: React.FC = () => {
     });
   
     try {
-      const response = await axios.post('http://localhost:3000/repair', repairData, {
+      const response = await axios.post('http://localhost:3001/repair', repairData, {
         headers: {
           'Content-Type': 'application/json',
         },

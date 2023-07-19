@@ -3,7 +3,7 @@ import os
 import json
 import sys
 
-url = "http://localhost:3000"
+url = "http://localhost:3001"
 
 if len(sys.argv) < 2:
     print("Invalid command format. Usage:")
@@ -48,7 +48,7 @@ elif command == "download":
         "requestId": download_req_id
     })
     download_headers = {'Content-Type': 'application/json'}
-    download_response = requests.get(download_url, headers=download_headers, data=download_data)
+    download_response = requests.post(download_url, headers=download_headers, data=download_data)
 
     if download_response.status_code == 200:
         with open(f"./{download_req_id}.zip", "wb") as f:

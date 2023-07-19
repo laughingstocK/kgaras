@@ -10,6 +10,6 @@ code /Users/krerkkiathemadhulin/.ssh/known_hosts
 
 upload /Users/krerkkiathemadhulin/Documents/city/Project/KnowledgeGraphAlignmentRepairAsAService/data/ekaw.owl
 python3 test.py repair f1c74eb1-52a4-413a-90ca-b47be1f35efb-cmt.owl 1ac10a7c-716e-41f5-a9c3-9ce349b70d04-ekaw.owl 222797fa-621c-4954-81d2-64d3decbd772-csa-cmt-ekaw.rdf 3cfb9bcb-43ce-4736-97ea-0f988c87ad32-cmt-ekaw.rdf alcomo
-python3 test.py download b40b082f-51f5-499d-a9fa-b9b3f3bb9830
+python3 test.py download 50fbe185-d7bf-4d86-8a1f-fea45887b9bf
 c7a76281-326b-4b47-92e2-4b1f2816ac4b
 b40b082f-51f5-499d-a9fa-b9b3f3bb9830

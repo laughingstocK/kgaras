@@ -104,7 +104,7 @@ app.post('/repair', async (req, res) => {
   `, service)
 })
 
-app.get('/download', async (req, res) => {
+app.post('/download', async (req, res) => {
   try {
 
     const { requestId } = req.body
