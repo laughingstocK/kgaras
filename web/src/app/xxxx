@@ -1,0 +1,235 @@
+"use client";
+import React, { useState, ChangeEvent } from 'react';
+
+const Home: React.FC = () => {
+  const [file, setFile] = useState<File | null>(null);
+  const [downloadReqId, setDownloadReqId] = useState<string>('');
+  const [ontologyId1, setOntologyId1] = useState<string>('');
+  const [ontologyId2, setOntologyId2] = useState<string>('');
+  const [alignId, setAlignId] = useState<string>('');
+  const [refId, setRefId] = useState<string>('');
+  const [service, setService] = useState<string>('');
+  const [uploadError, setUploadError] = useState<string>('');
+  const [downloadError, setDownloadError] = useState<string>('');
+  const [repairError, setRepairError] = useState<string>('');
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files && e.target.files[0];
+    setFile(selectedFile || null);
+  };
+
+  const handleUpload = () => {
+    if (!file) {
+      setUploadError('Please select a file');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    fetch('http://localhost:3001/upload', {
+      method: 'POST',
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('Upload response:', data);
+        // Process the upload response here
+      })
+      .catch((error) => {
+        console.error('Upload error:', error);
+      });
+  };
+
+  const handleDownload = () => {
+    if (!downloadReqId) {
+      alert('Please enter a download request ID');
+      return;
+    }
+
+    const downloadData = JSON.stringify({
+      requestId: downloadReqId,
+    });
+
+    fetch('http://localhost:3000/download', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: downloadData,
+    })
+      .then((response) => response.blob())
+      .then((blob) => {
+        // Create a temporary URL for the downloaded file
+        const downloadUrl = URL.createObjectURL(blob);
+        console.log('Download URL:', downloadUrl);
+        // Process the download URL here or trigger a download
+      })
+      .catch((error) => {
+        console.error('Download error:', error);
+      });
+  };
+
+  const handleRepair = () => {
+    if (!ontologyId1 || !ontologyId2 || !alignId || !refId || !service) {
+      alert('Please enter all repair parameters');
+      return;
+    }
+
+    const repairData = JSON.stringify({
+      ontologyId1,
+      ontologyId2,
+      alignId,
+      refId,
+      service,
+    });
+
+    fetch('http://localhost:3000/repair', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: repairData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('Repair response:', data);
+        // Process the repair response here
+      })
+      .catch((error) => {
+        console.error('Repair error:', error);
+      });
+  };
+
+  return (
+    <div className='flex flex-col items-center justify-center min-h-screen '>
+      <h1 className="text-3xl font-bold mb-10">
+        Knowledge Graph Alignment Repair As A Service
+      </h1>
+
+      <div className="flex items-center">
+        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">Upload file</label>
+        <div>
+        <input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" id="file_input" type="file" onChange={handleFileChange} />
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">OWL or RDF files.</p>
+        </div>
+        {/* 
+        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">Upload file</label>
+        <input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600" id="file_input" type="file" onChange={handleFileChange} /> */}
+        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleUpload}>Upload</button>
+      </div>
+
+      <div>
+        <h2>Download</h2>
+        <input
+          type="text"
+          value={downloadReqId}
+          onChange={(e) => setDownloadReqId(e.target.value)}
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          placeholder="Download Request ID"
+        />
+        <button onClick={handleDownload}>Download</button>
+      </div>
+
+      <div>
+        <h2>Repair</h2>
+        {/* <label htmlFor="first_name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">First name</label>
+        <input
+          type="text"
+          value={ontologyId1}
+          onChange={(e) => setOntologyId1(e.target.value)}
+          placeholder="Ontology ID 1"
+        /> */}
+
+        <div className="flex items-center">
+          <label htmlFor="ontology_id_1" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+            OntologyID 1 :
+          </label>
+          <input
+            type="text"
+            id="ontology_id_1"
+            value={ontologyId1}
+            onChange={(e) => setOntologyId1(e.target.value)}
+            placeholder="OntologyID 1"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"          />
+        </div>
+
+        {/* <input
+          type="text"
+          value={ontologyId2}
+          onChange={(e) => setOntologyId2(e.target.value)}
+          placeholder="Ontology ID 2"
+        /> */}
+
+        <div className="flex items-center mb-4">
+          <label htmlFor="ontology_id_2" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+            OntologyID 2 :
+          </label>
+          <input
+            type="text"
+            id="ontology_id_2"
+            value={ontologyId1}
+            onChange={(e) => setOntologyId2(e.target.value)}
+            placeholder="OntologyID 2"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          />
+        </div>
+
+        <div className="flex items-center">
+          <label htmlFor="align_id" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+            AlignID :
+          </label>
+          <input
+            type="text"
+            id="align_id"
+            value={ontologyId1}
+            onChange={(e) => setAlignId(e.target.value)}
+            placeholder="AlignID"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          />
+        </div>
+
+        <div className="flex items-center">
+          <label htmlFor="reference_id" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+            ReferenceID :
+          </label>
+          <input
+            type="text"
+            id="reference_id"
+            value={ontologyId1}
+            onChange={(e) => setRefId(e.target.value)}
+            placeholder="ReferenceID"
+            // className="border border-gray-300 rounded-lg p-2 text-gray-900 dark:text-gray-400 focus:outline-none"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          />
+        </div>
+
+        <div className="inline-block relative w-64">
+        <label htmlFor="reference_id" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+            Service :
+          </label>
+          <select 
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          >
+            <option>Logmap</option>
+            <option>Alcomo</option>
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+          </div>
+        </div>
+
+        {/* <input type="text" value={alignId} onChange={(e) => setAlignId(e.target.value)} placeholder="Align ID" />
+        <input type="text" value={refId} onChange={(e) => setRefId(e.target.value)} placeholder="Ref ID" />
+        <input type="text" value={service} onChange={(e) => setService(e.target.value)} placeholder="Service" /> */}
+        <div>
+          <label htmlFor="first_name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">First name</label>
+          <input type="text" id="first_name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="John" required />
+        </div>
+        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleRepair}>Repair</button>
+      </div>
+    </div>
+  );
+};
+
+export default Home;
