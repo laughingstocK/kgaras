@@ -9,3 +9,11 @@ services:
     # networks:
     #   - logmap-network
     platform: linux/amd64
+  alcomo:
+    container_name: alcomo
+    build: 
+      context: ./alcomo
+      dockerfile: Dockerfile
+    ports:
+      - 23:22
+    platform: linux/amd64
