@@ -33,35 +33,31 @@ import de.unima.alcomox.mapping.Characteristic;
 import de.unima.alcomox.mapping.Mapping;
 import de.unima.alcomox.ontology.IOntology;
 
-
-
 /**
-* This example illustrates the usage of ALCOMO to repair an
-* incoherent alignment. It is shows a standard usage of the system.
-* 
-*/
+ * This example illustrates the usage of ALCOMO to repair an
+ * incoherent alignment. It is shows a standard usage of the system.
+ * 
+ */
 public class ExampleXYZ {
-	
 
-
-    public static void main(String[] args) throws AlcomoException {
-        if (args.length < 4) {
-            System.out.println("Usage: java -jar ExampleXYZ.jar <ont1Path> <ont2Path> <alignPath> <refPath>");
-            return;
-        }
+	public static void main(String[] args) throws AlcomoException {
+		if (args.length < 4) {
+			System.out.println("Usage: java -jar ExampleXYZ.jar <ont1Path> <ont2Path> <alignPath> <refPath>");
+			return;
+		}
 		String requestId = args[0];
-        String ont1Path = args[1];
-        String ont2Path = args[2];
-        String alignPath = args[3];
-        String refPath = args[4];
-		
+		String ont1Path = args[1];
+		String ont2Path = args[2];
+		String alignPath = args[3];
+		String refPath = args[4];
+
 		// we ant to use Pellet as reasoner (alternatively use HERMIT)
 		Settings.BLACKBOX_REASONER = Settings.BlackBoxReasoner.PELLET;
-		
+
 		// if you want to force to generate a one-to-one alignment add this line
 		// by default its set to false
 		Settings.ONE_TO_ONE = true;
-		
+
 		// load ontologies as IOntology (uses fast indexing for efficient reasoning)
 		// formerly LocalOntology now IOntology is recommended
 		IOntology sourceOnt = new IOntology(ont1Path);
@@ -71,52 +67,52 @@ public class ExampleXYZ {
 		Mapping mapping = new Mapping(alignPath);
 		mapping.applyThreshhold(0.3);
 		System.out.println("thresholded input mapping has " + mapping.size() + " correspondences");
-		
+
 		// define diagnostic problem
 		ExtractionProblem ep = new ExtractionProblem(
 				ExtractionProblem.ENTITIES_CONCEPTSPROPERTIES,
-				ExtractionProblem.METHOD_OPTIMAL,
-				ExtractionProblem.REASONING_EFFICIENT
-		);
-		
+				ExtractionProblem.METHOD_GREEDY_MINIMIZE,
+				ExtractionProblem.REASONING_EFFICIENT);
+
 		// attach ontologies and mapping to the problem
 		ep.bindSourceOntology(sourceOnt);
 		ep.bindTargetOntology(targetOnt);
 		ep.bindMapping(mapping);
-		
+
 		// solve the problem
 		ep.solve();
-	
-		Mapping extracted = ep.getExtractedMapping();
-		System.out.println("mapping reduced from " + mapping.size() + " to " + extracted.size() + " correspondences");
-		System.out.println("removed the following correspondences:\n" + ep.getDiscardedMapping());
-		
-		// compare against reference alignment
-		Mapping ref = new Mapping(refPath);
-		Characteristic cBefore = new Characteristic(mapping, ref);
-		Characteristic cAfter = new Characteristic(extracted, ref);
-		
-		
-		System.out.println("before debugging (pre, rec, f): " + cBefore.toShortDesc());
-		System.out.println("after debugging (pre, rec, f):  " + cAfter.toShortDesc());
-
 		try {
-            FileWriter fileWriter = new FileWriter("/usr/src/app/out/" + requestId + "/" + requestId + ".txt");
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+			Mapping extracted = ep.getExtractedMapping();
+			extracted.write("/usr/src/app/out/" + requestId + "/" + requestId + ".rdf", Mapping.FORMAT_RDF);
+
+			System.out.println("mapping reduced from " + mapping.size() + " to " + extracted.size() + " correspondences");
+			System.out.println("removed the following correspondences:\n" + ep.getDiscardedMapping());
+
+			// compare against reference alignment
+			Mapping ref = new Mapping(refPath);
+			Characteristic cBefore = new Characteristic(mapping, ref);
+			Characteristic cAfter = new Characteristic(extracted, ref);
+
+			System.out.println("before debugging (pre, rec, f): " + cBefore.toShortDesc());
+			System.out.println("after debugging (pre, rec, f):  " + cAfter.toShortDesc());
+
+			FileWriter fileWriter = new FileWriter("/usr/src/app/out/" + requestId + "/" + requestId + ".txt");
+			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
 			bufferedWriter.write("thresholded input mapping has " + mapping.size() + " correspondences" + "\n");
 
-			bufferedWriter.write("mapping reduced from " + mapping.size() + " to " + extracted.size() + " correspondences" + "\n");
+			bufferedWriter
+					.write("mapping reduced from " + mapping.size() + " to " + extracted.size() + " correspondences" + "\n");
 			bufferedWriter.write("removed the following correspondences:\n" + ep.getDiscardedMapping() + "\n");
 			bufferedWriter.write("before debugging (pre, rec, f): " + cBefore.toShortDesc() + "\n");
 			bufferedWriter.write("after debugging (pre, rec, f):  " + cAfter.toShortDesc() + "\n");
 
-            bufferedWriter.close();
+			bufferedWriter.close();
 
-            System.out.println("Text has been written to the file successfully.");
-        } catch (IOException e) {
-            System.out.println("An error occurred while writing to the file: " + e.getMessage());
-        }
+			System.out.println("Text has been written to the file successfully.");
+		} catch (IOException e) {
+			System.out.println("An error occurred while writing to the file: " + e.getMessage());
+		}
 	}
 
 }
