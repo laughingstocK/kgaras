@@ -6,10 +6,13 @@ const cors = require("cors")
 const { v4: uuidv4 } = require('uuid')
 const { executeCommand } = require('./handlers/command')
 const { fileStorageEngine } = require('./handlers/fileStore')
+const { pollRepairStatus, checkRepairStatus } = require('./handlers/polling')
 const { runSSHCommand } = require('./handlers/ssh')
+const { PrismaClient } = require("@prisma/client")
 const config = require('./config')
 
 const { port, sshUser, logmapUrl } = config
+const prisma = new PrismaClient()
 
 const app = express()
 
@@ -48,6 +51,13 @@ app.post('/repair', async (req, res) => {
     requestId,
   })
 
+  const repair = await prisma.repair.create({
+    data: {
+      requestId,
+      status: "CREATED"
+    },
+  })
+
   await runSSHCommand(`mkdir /usr/src/app/data/${requestId} && \
                        mkdir /usr/src/app/out/${requestId}`, service)
 
@@ -58,6 +68,10 @@ app.post('/repair', async (req, res) => {
        scp -P 22 ./files/${alignId} ${sshUser}@${logmapUrl}:/usr/src/app/data/${requestId}
       `,
     );
+    await prisma.repair.update({
+      where: { id: repair.id, requestId },
+      data: { status: "REPAIRING" },
+    })
 
     const java = '/opt/ibm/java/bin/java'
     const onto1Path = `file:/usr/src/app/data/${requestId}/${ontologyId1}`
@@ -65,8 +79,13 @@ app.post('/repair', async (req, res) => {
     const alignPath = `/usr/src/app/data/${requestId}/${alignId}`
     const outputPath = `/usr/src/app/out/${requestId}`
 
-    await runSSHCommand(`${java} -jar target/logmap-matcher-4.0.jar DEBUGGER ${onto1Path} ${onto2Path} RDF ${alignPath} ${outputPath} false true`, service)
-
+    const output = await runSSHCommand(`${java} -jar target/logmap-matcher-4.0.jar DEBUGGER ${onto1Path} ${onto2Path} RDF ${alignPath} ${outputPath} false true`, service)
+    if (output.includes('Done')) {
+      await prisma.repair.update({
+        where: { id: repair.id, requestId },
+        data: { status: "DONE" },
+      })
+    }
     await runSSHCommand(`cd ../out && zip -r ${requestId}.zip ${requestId}`, service);
 
     await executeCommand(
@@ -81,6 +100,10 @@ app.post('/repair', async (req, res) => {
        scp -P 23 ./files/${refId} ${sshUser}@${logmapUrl}:/usr/src/app/data/${requestId}
       `,
     );
+    await prisma.repair.update({
+      where: { id: repair.id, requestId },
+      data: { status: "REPAIRING" },
+    })
 
     const java = '/usr/bin/java'
     const onto1Path = `/usr/src/app/data/${requestId}/${ontologyId1}`
@@ -88,8 +111,13 @@ app.post('/repair', async (req, res) => {
     const alignPath = `/usr/src/app/data/${requestId}/${alignId}`
     const refPath = `/usr/src/app/data/${requestId}/${refId}`
 
-    await runSSHCommand(`${java} -cp dist/alcomo.jar ExampleXYZ "${requestId}" "${onto1Path}" "${onto2Path}" "${alignPath}" "${refPath}"`, service)
-
+    const output = await runSSHCommand(`${java} -cp dist/alcomo.jar ExampleXYZ "${requestId}" "${onto1Path}" "${onto2Path}" "${alignPath}" "${refPath}"`, service)
+    if (output.includes('successfully')) {
+      await prisma.repair.update({
+        where: { id: repair.id, requestId },
+        data: { status: "DONE" },
+      })
+    }
     await runSSHCommand(`cd ../out && zip -r ${requestId}.zip ${requestId}`, service);
 
     await executeCommand(
@@ -125,6 +153,24 @@ app.post('/download', async (req, res) => {
     res.status(500).send('An error occurred')
   }
 })
+
+app.get('/poll/:repairId', async (req, res) => {
+  const requestId = req.params.requestId;
+  const pollingInterval = 5000; 
+  const maxPollingAttempts = 10;
+
+  await pollRepairStatus(prisma, requestId, pollingInterval, maxPollingAttempts);
+
+  res.json({ message: 'Polling completed.' });
+});
+
+app.get('/check-status/:requestId', async (req, res) => {
+  const requestId = req.params.requestId;
+
+  const status = await checkRepairStatus(prisma, requestId);
+
+  res.json({ status });
+});
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);

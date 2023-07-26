@@ -10,4 +10,11 @@ code /Users/krerkkiathemadhulin/.ssh/known_hosts
 
 python3 app.py upload /Users/krerkkiathemadhulin/Documents/city/Project/KnowledgeGraphAlignmentRepairAsAService/data/ekaw.owl
 python3 app.py repair f1c74eb1-52a4-413a-90ca-b47be1f35efb-cmt.owl 1ac10a7c-716e-41f5-a9c3-9ce349b70d04-ekaw.owl 222797fa-621c-4954-81d2-64d3decbd772-csa-cmt-ekaw.rdf 3cfb9bcb-43ce-4736-97ea-0f988c87ad32-cmt-ekaw.rdf alcomo
-python3 app.py download dcc25538-0139-4deb-b449-227313603f83
+python3 app.py download d1f0ffe1-fadb-4474-ac00-5470dda93247
+
+python3 app.py repair2 \
+ /Users/krerkkiathemadhulin/Documents/city/Project/KnowledgeGraphAlignmentRepairAsAService/data/cmt.owl \
+ /Users/krerkkiathemadhulin/Documents/city/Project/KnowledgeGraphAlignmentRepairAsAService/data/ekaw.owl \
+ /Users/krerkkiathemadhulin/Documents/city/Project/KnowledgeGraphAlignmentRepairAsAService/data/csa-cmt-ekaw.rdf \
+ /Users/krerkkiathemadhulin/Documents/city/Project/KnowledgeGraphAlignmentRepairAsAService/data/cmt-ekaw.rdf \
+ alcomo

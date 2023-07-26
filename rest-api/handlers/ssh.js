@@ -46,6 +46,7 @@ async function runSSHCommand(command, service) {
 
     const output = await executeSSHCommand(logmapUrl, sshUser, privateKeyPath, command, service)
     console.log('SSH command output:', output)
+    return output
   } catch (err) {
     console.log('Error executing SSH command:', err)
     console.error('Error executing SSH command:', err)

@@ -1,0 +1,25 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Status {
+  CREATED
+  REPAIRING
+  DONE
+  FAILED
+}
+
+datasource db {
+  provider = "mysql" // Replace with your database provider (mysql, postgres, etc.)
+  url      = env("DATABASE_URL") // Replace with your database connection URL
+}
+
+model Repair {
+  id        Int    @id @default(autoincrement())
+  requestId String
+  status    Status
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
