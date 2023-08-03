@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef, ChangeEvent, useContext } from 'react';
+import React, { useState, useRef } from 'react';
 import Modal from '../../components/modal';
 import uploadFile from '../../lib/uploadFile';
 import download from '../../lib/download';
@@ -7,37 +7,40 @@ import repair, { RepairRequest } from '../../lib/repair';
 import { AxiosResponse } from 'axios';
 import InputFile from '@/app/intputFile/InputFile'
 import { useGlobalContext } from '@/app/contexts/file'
-import Loader from '../../components/Loader';
 
 const Home: React.FC = () => {
   const [service, setService] = useState<string>('alcomo');
   const [uploadError, setUploadError] = useState<string>('');
   const [repairError, setRepairError] = useState<string>('');
   const [showModal, setShowModal] = useState(false);
-  const [showLoader, setShowLoader] = useState(false);
-  const [repairSuccess, setRepairSuccess] = useState(false);
-  const [uploadResponse, setUploadResponse] = useState<any>(null); // Use appropriate type for the response object
   const [repairResponse, setRepairResponse] = useState<any>(null);
-  
+
   const intervalIdRef = useRef<NodeJS.Timer | null>(null);
   const { data } = useGlobalContext();
 
   const closeModal = () => {
     setShowModal(false);
+    clearInterval(intervalIdRef.current!)
   };
-
-  useEffect(() => {
-    if(repairSuccess) {
-      clearInterval(intervalIdRef.current!)
-      setShowModal(false);
-    }
-  }, [repairSuccess]);
 
   const fetchData = async (requestId: any) => {
     const response = await fetch('http://localhost:3001/check-status/' + requestId)
     const newData = await response.json();
+    console.log('>>>>>', newData, repairResponse);
     if (newData.status == 'DONE') {
-      setRepairSuccess(true);
+
+      clearInterval(intervalIdRef.current!)
+      setShowModal(false)
+
+      const resDownload = await download(repairResponse.requestId);
+
+      const downloadUrl = URL.createObjectURL(resDownload.data);
+      const downloadLink = document.createElement('a');
+      downloadLink.href = downloadUrl;
+      downloadLink.download = repairResponse.requestId + '.zip';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
     }
   };
 
@@ -66,16 +69,8 @@ const Home: React.FC = () => {
       }
 
       const resRepair = await repair(repairData);
-      // const resDownload = await download(resRepair.data.requestId);
 
-      // const downloadUrl = URL.createObjectURL(resDownload.data);
-      // const downloadLink = document.createElement('a');
-      // downloadLink.href = downloadUrl;
-      // downloadLink.download = resRepair.data.requestId + '.zip';
-      // document.body.appendChild(downloadLink);
-      // downloadLink.click();
-      // document.body.removeChild(downloadLink);
-      setUploadResponse(resRepair.data); 
+      setRepairResponse(resRepair.data);
       setShowModal(true)
       intervalIdRef.current = setInterval(() => fetchData(resRepair.data.requestId), 2000);
     } catch (err) {
@@ -132,14 +127,10 @@ const Home: React.FC = () => {
                 Repair
               </button>
               {uploadError && <p>{uploadError}</p>}
-              {/* {showLoader && (
-                <Loader showLoader={showLoader} onClose={closeLoader} response={repairResponse}>
-                  {uploadResponse}
-                </Loader>
-              )} */}
+
               {showModal && (
-                <Modal showModal={showModal} onClose={closeModal} response={uploadResponse}>
-                  {uploadResponse}
+                <Modal showModal={showModal} onClose={closeModal}>
+                  {repairResponse}
                   <button onClick={closeModal}>Close</button>
                 </Modal>
 

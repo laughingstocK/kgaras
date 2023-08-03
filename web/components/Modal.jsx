@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styles from './Modal.module.css';
 
-const Modal = ({ showModal, onClose, response, children }) => {
+const Modal = ({ showModal, onClose, children }) => {
   const modalStyle = {
     display: showModal ? 'flex' : 'none',
     position: 'fixed',
@@ -18,7 +18,6 @@ const Modal = ({ showModal, onClose, response, children }) => {
   return (
     <div style={modalStyle}>
       <div className={styles.modalContent}>
-        {response ? (
           <div
             className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
             role="status">
@@ -32,16 +31,6 @@ const Modal = ({ showModal, onClose, response, children }) => {
               </button>
             </div>
           </div>
-        ) : (
-          <div>
-            {children}
-            <div style={{ textAlign: 'center', marginTop: '20px' }}>
-              <button className={styles.closeButton} onClick={onClose}>
-                Close
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
