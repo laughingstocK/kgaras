@@ -27,8 +27,8 @@ RUN mvn package
 
 RUN apk add --update --no-cache openssh 
 
-RUN adduser -h /usr/src/app/logmap-matcher -s /bin/sh -D rob
-RUN echo -n 'rob:rob' | chpasswd
+RUN adduser -h /usr/src/app/logmap-matcher -s /bin/sh -D krerkkiat
+RUN echo -n 'krerkkiat:abcdefg' | chpasswd
 
 COPY id_rsa.pub id_rsa.pub
 RUN mkdir /usr/src/app/logmap-matcher/.ssh

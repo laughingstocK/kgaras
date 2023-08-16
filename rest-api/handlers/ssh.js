@@ -6,7 +6,7 @@ const { logmapUrl, sshUser, privateKeyPath } = config
 
 function executeSSHCommand(host, username, privateKeyPath, command, service) {
   return new Promise((resolve, reject) => {
-    const port = service === 'logmap' ? 22 : 23
+    const port = 22
     const conn = new Client();
     conn.on('ready', () => {
       conn.exec(command, (err, stream) => {
@@ -41,10 +41,10 @@ function executeSSHCommand(host, username, privateKeyPath, command, service) {
   });
 }
 
-async function runSSHCommand(command, service) {
+async function runSSHCommand(url, command, service) {
   try {
 
-    const output = await executeSSHCommand(logmapUrl, sshUser, privateKeyPath, command, service)
+    const output = await executeSSHCommand(url, sshUser, privateKeyPath, command, service)
     console.log('SSH command output:', output)
     return output
   } catch (err) {

@@ -6,9 +6,10 @@ services:
       dockerfile: logmap-dockerfile
     ports:
       - 22:22
-    # networks:
-    #   - logmap-network
+    networks:
+      - kgaras-network
     platform: linux/amd64
+
   alcomo:
     container_name: alcomo
     build: 
@@ -16,8 +17,22 @@ services:
       dockerfile: Dockerfile
     ports:
       - 23:22
+    networks:
+      - kgaras-network
     platform: linux/amd64
+    
 
+  rest-api:
+    container_name: rest-api
+    build:
+      context: ./rest-api
+      dockerfile: Dockerfile
+    ports:
+      - 3001:3001
+    networks:
+      - kgaras-network
+    restart: always
+    
   mariadb:
     container_name: mariadb
     build:
@@ -25,9 +40,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3306:3306"
+    networks:
+      - kgaras-network
     platform: linux/amd64
     volumes:
       - db_data:/var/lib/mysql
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
 volumes:
   db_data:
+networks:
+  kgaras-network:

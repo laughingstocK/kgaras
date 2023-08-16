@@ -1,10 +1,11 @@
 require('dotenv').config();
 
 const config = {
-  port: process.env.PORT || 3000,
+  port: process.env.PORT || 3001,
   sshUser: process.env.SSH_USER || 'rob',
-  logmapUrl: process.env.LOGMAP_URL || 'localhost',
-  privateKeyPath: process.env.PRIVATE_KEY_PATH || '/Users/krerkkiathemadhulin/.ssh/id_rsa',
+  logmapUrl: process.env.LOGMAP_URL || 'logmap',
+  alcomoUrl: process.env.ALCOMO_URL || 'alcomo',
+  privateKeyPath: process.env.PRIVATE_KEY_PATH || '/root/.ssh/id_rsa',
   database: {
     host: process.env.DATABASE_HOST || 'localhost',
     name: process.env.DATABASE_NAME || 'ontology_repair_db',

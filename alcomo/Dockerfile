@@ -21,8 +21,8 @@ ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk
 # Add Java binaries to the PATH environment variable
 ENV PATH=$PATH:$JAVA_HOME/bin
 
-RUN adduser -h /usr/src/app/alcomo -s /bin/sh -D rob
-RUN echo -n 'rob:rob' | chpasswd
+RUN adduser -h /usr/src/app/alcomo -s /bin/sh -D krerkkiat
+RUN echo -n 'krerkkiat:abcdefg' | chpasswd
 
 COPY id_rsa.pub id_rsa.pub
 RUN mkdir /usr/src/app/alcomo/.ssh
