@@ -43,4 +43,4 @@ RUN chmod -R 777 ./*
 COPY entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]
 
-EXPOSE 22
+EXPOSE 23
