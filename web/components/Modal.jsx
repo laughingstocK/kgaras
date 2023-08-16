@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styles from './Modal.module.css';
 
-const Modal = ({ showModal, onClose, children }) => {
+const Modal = ({ showModal, onClose, response, children }) => {
   const modalStyle = {
     display: showModal ? 'flex' : 'none',
     position: 'fixed',
@@ -18,23 +18,29 @@ const Modal = ({ showModal, onClose, children }) => {
   return (
     <div style={modalStyle}>
       <div className={styles.modalContent}>
-          <div
-            className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-            role="status">
-            <span
-              className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-              Loading...
-            </span>
-            <div style={{ textAlign: 'center', marginTop: '20px' }}>
-              <button className={styles.closeButton} onClick={onClose}>
-                Close
-              </button>
-            </div>
+        <div
+          className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+          role="status">
+          <span
+            className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+            Loading...
+          </span>
+          <div>
+            {Object.entries(response).map(([key, value]) => (
+              <p key={key}>
+                {key}: {value}
+              </p>
+            ))}
           </div>
+          <div style={{ textAlign: 'center', marginTop: '20px' }}>
+            <button className={styles.closeButton} onClick={onClose}>
+              Close
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
-
 
 export default Modal;

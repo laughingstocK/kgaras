@@ -23,21 +23,20 @@ const Home: React.FC = () => {
     clearInterval(intervalIdRef.current!)
   };
 
-  const fetchData = async (requestId: any) => {
+  const fetchData = async (requestId: string) => {
     const response = await fetch('http://localhost:3001/check-status/' + requestId)
     const newData = await response.json();
-    console.log('>>>>>', newData, repairResponse);
     if (newData.status == 'DONE') {
 
       clearInterval(intervalIdRef.current!)
       setShowModal(false)
-
-      const resDownload = await download(repairResponse.requestId);
+      
+      const resDownload = await download(requestId);
 
       const downloadUrl = URL.createObjectURL(resDownload.data);
       const downloadLink = document.createElement('a');
       downloadLink.href = downloadUrl;
-      downloadLink.download = repairResponse.requestId + '.zip';
+      downloadLink.download = requestId + '.zip';
       document.body.appendChild(downloadLink);
       downloadLink.click();
       document.body.removeChild(downloadLink);
@@ -129,7 +128,7 @@ const Home: React.FC = () => {
               {uploadError && <p>{uploadError}</p>}
 
               {showModal && (
-                <Modal showModal={showModal} onClose={closeModal}>
+                <Modal showModal={showModal} onClose={closeModal} response={repairResponse}>
                   {repairResponse}
                   <button onClick={closeModal}>Close</button>
                 </Modal>

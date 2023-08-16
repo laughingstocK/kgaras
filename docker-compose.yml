@@ -17,3 +17,17 @@ services:
     ports:
       - 23:22
     platform: linux/amd64
+
+  mariadb:
+    container_name: mariadb
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    ports:
+      - "3306:3306"
+    platform: linux/amd64
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+volumes:
+  db_data:
