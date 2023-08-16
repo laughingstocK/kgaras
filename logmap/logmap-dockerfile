@@ -17,7 +17,7 @@ RUN chmod 777 ./out
 
 COPY --from=CLONER /usr/src/app/logmap-matcher /usr/src/app/logmap-matcher
 
-COPY data data
+RUN mkdir data
 
 RUN chmod 777 ./data
 
