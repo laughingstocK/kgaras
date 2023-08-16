@@ -156,16 +156,6 @@ app.post('/download', async (req, res) => {
   }
 })
 
-app.get('/poll/:repairId', async (req, res) => {
-  const requestId = req.params.requestId;
-  const pollingInterval = 5000; 
-  const maxPollingAttempts = 10;
-
-  await pollRepairStatus(prisma, requestId, pollingInterval, maxPollingAttempts);
-
-  res.json({ message: 'Polling completed.' });
-});
-
 app.get('/check-status/:requestId', async (req, res) => {
   const requestId = req.params.requestId;
   let status
