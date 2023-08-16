@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef } from 'react';
-import Modal from '../../components/modal';
+import Modal from './components/modal';
 import uploadFile from '../../lib/uploadFile';
 import download from '../../lib/download';
 import repair, { RepairRequest } from '../../lib/repair';
