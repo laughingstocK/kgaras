@@ -168,10 +168,13 @@ app.get('/poll/:repairId', async (req, res) => {
 
 app.get('/check-status/:requestId', async (req, res) => {
   const requestId = req.params.requestId;
-
-  const status = await checkRepairStatus(prisma, requestId);
-
-  res.json({ status });
+  let status
+  try {
+    status = await checkRepairStatus(prisma, requestId);
+    return res.json({ status });
+  } catch (error) {
+    return res.json({ error: error.message });
+  }
 });
 
 app.listen(port, () => {

@@ -3,11 +3,13 @@ async function checkRepairStatus(prisma, requestId) {
     const result = await prisma.repair.findFirst({
       where: { requestId },
     })
+    if (!result) {
+      throw new Error(`Repair with requestId ${requestId} not found`);
+    }
     return result.status
   } catch (error) {
-    // Handle error (e.g., network error, invalid URL, etc.)
     console.error('Error checking repair status:', error.message);
-    return null;
+    throw error;
   }
 }
 
