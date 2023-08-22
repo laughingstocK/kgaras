@@ -36,7 +36,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
 })
 
 app.post('/repair', async (req, res) => {
-  const { ontologyId1, ontologyId2, alignId, refId, service } = req.body
+  const { ontologyId1, ontologyId2, alignId, refId, service, email } = req.body
 
   if (!ontologyId1 || !ontologyId2) {
     return res.status(400).send('OntologyId1 or ontologyId2 is missing');
@@ -129,7 +129,7 @@ app.post('/repair', async (req, res) => {
 
   }
 
-  await sendEmail(prisma, requestId)
+  await sendEmail(requestId, email)
 
   await runSSHCommand(url, `
   rm -rf /usr/src/app/out/${requestId} && \

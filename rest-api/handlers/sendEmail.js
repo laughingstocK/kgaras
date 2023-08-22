@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer')
 
-async function sendEmail(prisma, requestId, email) {
+async function sendEmail(requestId, email) {
   try {
 
     // Create a transporter using the default SMTP transport
@@ -14,15 +14,15 @@ async function sendEmail(prisma, requestId, email) {
 
     const attachment = {
       filename: requestId + '.zip',
-      path: `/usr/src/app/out/${requestId}.zip`
+      path: `/app/outputs/${requestId}.zip`
     };
 
     let info = await transporter.sendMail({
       from: '"Your Name" <kgaras.service@gmail.com>',
       to: email, 
-      subject: 'Hello from Nodemailer', // Subject line
-      text: 'This is a test email', // Plain text body
-      html: '<b>This is a test email</b>', // HTML body
+      subject: 'Knowledge Graph Alignment Result', // Subject line
+      text: 'Here is the result of the knowledge graph alignment:', // Plain text body
+      html: `<p><b>Here is the result of the knowledge graph alignment:</b></p><pre>${requestId}</pre>`, // HTML body
       attachments: [attachment] // Add the attachment to the email
     });
 
