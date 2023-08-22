@@ -5,7 +5,7 @@ export default async function uploadFile(file: File): Promise<AxiosResponse<any>
     const formData = new FormData()
     formData.append('file', file)
 
-    const response = await axios.post('http://rest-api/upload', formData)
+    const response = await axios.post('http://rest-api:3001/upload', formData)
     return response
   } catch (error) {
     throw new Error('Upload error:' + error)
