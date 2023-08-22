@@ -5,7 +5,7 @@ export default async function download(downloadReqId: string): Promise<AxiosResp
     requestId: downloadReqId,
   });
   try {
-    const response = await axios.post('http://rest-api:3001/download', downloadData, {
+    const response = await axios.post('http://16.171.137.217:3001/download', downloadData, {
       headers: {
         'Content-Type': 'application/json'
       },

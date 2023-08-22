@@ -36,7 +36,7 @@ const Home: React.FC = () => {
   };
 
   const fetchData = async (requestId: string) => {
-    const response = await fetch('http://rest-api:3001/check-status/' + requestId)
+    const response = await fetch('http://16.171.137.217:3001/check-status/' + requestId)
     const newData = await response.json();
     if (newData.status == 'DONE') {
 
