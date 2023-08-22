@@ -6,6 +6,7 @@ export type RepairRequest = {
   alignId: string,
   refId: string,
   service: string,
+  email?: string,
 }
 
 export default async function repair({
@@ -13,7 +14,8 @@ export default async function repair({
   ontologyId2,
   alignId,
   refId,
-  service
+  service,
+  email,
 }: RepairRequest): Promise<AxiosResponse<any>> {
   try {
     const repairData = JSON.stringify({
@@ -22,10 +24,11 @@ export default async function repair({
       alignId,
       refId,
       service,
+      email
     })
 
 
-    const response = await axios.post('http://localhost:3001/repair', repairData, {
+    const response = await axios.post('http://16.171.137.217:3001/repair', repairData, {
       headers: {
         'Content-Type': 'application/json',
       },

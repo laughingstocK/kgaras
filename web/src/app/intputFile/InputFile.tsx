@@ -26,22 +26,24 @@ const InputFile: React.FC<InputFileProps> = ({ inputName }) => {
   };
 
   return (<div className="mb-8">
-    <label htmlFor="ontology_id_1" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+    <label htmlFor="ontology_id_1" className="block text-sm font-medium text-gray-600">
       {inputName}
     </label>
-    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">
+    <label className="block mb-2 text-sm font-medium" htmlFor="file_input">
     </label>
     <div className="flex items-center">
       <input
-        className="block w-3/4 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+        className="block w-full text-sm text-slate-500
+        file:mr-4 file:py-2 file:px-4
+        file:rounded-full file:border-0
+        file:text-sm file:font-semibold
+        file:bg-blue-50 file:text-blue-700
+        hover:file:bg-blue-100"
         aria-describedby="file_input_help"
         id="file_input"
         type="file"
         onChange={handleFileChange}
       />
-      {/* <p className="ml-4 mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">
-  OWL or RDF files.
-</p> */}
     </div>
   </div>)
 
