@@ -28,7 +28,7 @@ export default async function repair({
     })
 
 
-    const response = await axios.post('http://rest-api:3001/repair', repairData, {
+    const response = await axios.post('http://rest-api/repair', repairData, {
       headers: {
         'Content-Type': 'application/json',
       },
