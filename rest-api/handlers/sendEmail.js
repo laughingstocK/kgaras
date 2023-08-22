@@ -7,7 +7,7 @@ async function sendEmail(prisma, requestId, email) {
     let transporter = nodemailer.createTransport({
       service: 'Gmail',
       auth: {
-        user: 'your_email@gmail.com', // Your Gmail email
+        user: 'kgaras.service@gmail.com', // Your Gmail email
         pass: 'etoprapxgvbmtzkq' // Your Gmail password or App-specific password
       }
     });
