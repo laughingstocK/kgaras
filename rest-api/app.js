@@ -7,6 +7,7 @@ const { v4: uuidv4 } = require('uuid')
 const { executeCommand } = require('./handlers/command')
 const { fileStorageEngine } = require('./handlers/fileStore')
 const { pollRepairStatus, checkRepairStatus } = require('./handlers/polling')
+const { sendEmail } = require('./handlers/sendEmail')
 const { runSSHCommand } = require('./handlers/ssh')
 const { PrismaClient } = require("@prisma/client")
 const config = require('./config')
@@ -127,6 +128,8 @@ app.post('/repair', async (req, res) => {
     )
 
   }
+
+  await sendEmail(prisma, requestId)
 
   await runSSHCommand(url, `
   rm -rf /usr/src/app/out/${requestId} && \
