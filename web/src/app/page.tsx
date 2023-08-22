@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef } from 'react';
-import Modal from './components/modal';
-import Modal2 from './components/modal2';
+import Modal from './components/Modal';
+import Modal2 from './components/Modal2';
 import uploadFile from '../../lib/uploadFile';
 import download from '../../lib/download';
 import checkStatus from '../../lib/checkstatus';

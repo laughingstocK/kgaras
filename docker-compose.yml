@@ -33,6 +33,17 @@ services:
       - kgaras-network
     restart: always
     
+  web:
+    container_name: web
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    networks:
+      - kgaras-network
+    platform: linux/amd64
+
   mariadb:
     container_name: mariadb
     build:

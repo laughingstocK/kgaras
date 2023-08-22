@@ -25,7 +25,11 @@ const GlobalContext = createContext<ContextProps>({
   setData: () => {},
 });
 
-export const GlobalContextProvider = ({ children }) => {
+interface GlobalContextProviderProps {
+  children: React.ReactNode;
+}
+
+export const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({ children }) => {
   const [data, setData] = useState<Repair>(initialRepairData);
 
   return (
