@@ -12,7 +12,8 @@ import { useGlobalContext } from '@/app/contexts/file'
 
 const Home: React.FC = () => {
   const [service, setService] = useState<string>('alcomo');
-  const [uploadError, setUploadError] = useState<string>('');
+  const [checkStatusError, setCheckStatusError] = useState<string>('');
+  const [downloadError, setDownloadError] = useState<string>('');
   const [repairError, setRepairError] = useState<string>('');
   const [showModal, setShowModal] = useState(false);
   const [showModal2, setShowModal2] = useState(false);
@@ -35,7 +36,7 @@ const Home: React.FC = () => {
   };
 
   const fetchData = async (requestId: string) => {
-    const response = await fetch('http://16.171.137.217:3001/check-status/' + requestId)
+    const response = await fetch('http://rest-api:3001/check-status/' + requestId)
     const newData = await response.json();
     if (newData.status == 'DONE') {
 
@@ -57,10 +58,10 @@ const Home: React.FC = () => {
   const handleCheckStatus = async (event: any) => {
     event.preventDefault();
 
-    setUploadError('');
+    setCheckStatusError('');
 
     if (!repairId) {
-      setUploadError('Please enter a Repair ID.');
+      setCheckStatusError('Please enter a Repair ID.');
       return;
     }
 
@@ -73,10 +74,10 @@ const Home: React.FC = () => {
   const handleDownload = async (event: any) => {
     event.preventDefault();
 
-    setUploadError('');
+    setDownloadError('');
 
     if (!repairId2) {
-      setUploadError('Please enter a Repair ID.');
+      setDownloadError('Please enter a Repair ID.');
       return;
     }
 
@@ -95,7 +96,7 @@ const Home: React.FC = () => {
 
   const handleRepair = async () => {
     if (!data.ontology1 || !data.ontology2 || !data.alignId || !email) {
-      setRepairError('Please select two ontologies');
+      setRepairError('Please fill all required fields');
       return;
     }
 
@@ -152,12 +153,14 @@ const Home: React.FC = () => {
             <InputFile inputName={"Reference ID:"} />
           </div>
 
-          <div className='flex items-stretch space-x-4 mt-1'>
-            <div className='self-center'>
+
+        <div className='flex flex-wrap'>
+        <div className="mt-6 basis-1/4">
               <label htmlFor="service" className="block text-sm font-semibold text-gray-600">
                 Service
               </label>
-            </div>
+            
+          <div className='basis-1/4 flex items-stretch space-x-4 mt-1 self-center'>
             <div>
               <select
                 id="service"
@@ -169,6 +172,7 @@ const Home: React.FC = () => {
                 <option value="alcomo">Alcomo</option>
               </select>
             </div>
+          </div>
           </div>
 
           <div className="mt-6">
@@ -183,13 +187,15 @@ const Home: React.FC = () => {
             <p className='text-xs text-gray-600'>Please enter your email address in the field below to receive the results. <br></br>We will send the outcome directly to your provided email.</p>
           </div>
 
+          </div>
+
           <div className='grid justify-items-center mt-10'>
             <button
               className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-5 py-2.5 ml-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
               onClick={handleRepair}>
               Repair
             </button>
-            {uploadError && <p>{uploadError}</p>}
+            {repairError &&  <p className="block text-sm font-semibold mt-2 text-red-600">{repairError}</p>}
 
             {showModal && (
               <Modal showModal={showModal} onClose={closeModal} response={repairResponse}>
@@ -222,7 +228,7 @@ const Home: React.FC = () => {
                 >
                   Check
                 </button>
-                {uploadError && <p>{uploadError}</p>}
+                {checkStatusError && <p className="block text-sm font-semibold text-red-600">{checkStatusError}</p>}
 
                 {showModal2 && (
                   <Modal2 showModal={showModal2} onClose={closeModal2} response={checkstatusResponse}>
@@ -259,7 +265,7 @@ const Home: React.FC = () => {
                 >
                   Download
                 </button>
-                {uploadError && <p>{uploadError}</p>}
+                {downloadError && <p className="block text-sm font-semibold text-red-600">{downloadError}</p>}
               </form>
             </div>
           </div>
