@@ -95,39 +95,79 @@ const Home: React.FC = () => {
   }
 
   const handleRepair = async () => {
-    if (!data.ontology1 || !data.ontology2 || !data.alignId || !email) {
-      setRepairError('Please fill all required fields');
-      return;
-    }
 
-    try {
-      const fileUploadPromises: Promise<AxiosResponse<any>>[] = [];
-
-      fileUploadPromises.push(uploadFile(data.ontology1));
-      fileUploadPromises.push(uploadFile(data.ontology2));
-      fileUploadPromises.push(uploadFile(data.alignId));
-      if (data.refId) fileUploadPromises.push(uploadFile(data.refId));
-
-      const [ontology1Result, ontology2Result, alignIdResult, refIdResult] = await Promise.all(fileUploadPromises);
-
-      const repairData: RepairRequest = {
-        ontologyId1: ontology1Result.data.fileName,
-        ontologyId2: ontology2Result.data.fileName,
-        alignId: alignIdResult.data.fileName,
-        refId: refIdResult.data.fileName || '',
-        service: service,
-        email: email
+    if (service == 'logmap') {
+      if (!data.ontology1 || !data.ontology2 || !data.alignId || !email) {
+        setRepairError('Please fill all required fields');
+        return;
+      }
+      try {
+        const fileUploadPromises: Promise<AxiosResponse<any>>[] = [];
+  
+  
+        fileUploadPromises.push(uploadFile(data.ontology1));
+        fileUploadPromises.push(uploadFile(data.ontology2));
+        fileUploadPromises.push(uploadFile(data.alignId));
+  
+        const [ontology1Result, ontology2Result, alignIdResult] = await Promise.all(fileUploadPromises);
+  
+        const repairData: RepairRequest = {
+          ontologyId1: ontology1Result.data.fileName,
+          ontologyId2: ontology2Result.data.fileName,
+          alignId: alignIdResult.data.fileName,
+          refId: '',
+          service: service,
+          email: email
+        }
+  
+        const resRepair = await repair(repairData);
+  
+        setRepairResponse(resRepair.data);
+        setShowModal(true)
+        intervalIdRef.current = setInterval(() => fetchData(resRepair.data.requestId), 2000);
+      } catch (err) {
+        console.log(err);
+        setRepairError('Something went wrong');
       }
 
-      const resRepair = await repair(repairData);
+    } else {
 
-      setRepairResponse(resRepair.data);
-      setShowModal(true)
-      intervalIdRef.current = setInterval(() => fetchData(resRepair.data.requestId), 2000);
-    } catch (err) {
-      console.log(err);
-      setRepairError('Something went wrong');
+      if (!data.ontology1 || !data.ontology2 || !data.alignId || !data.refId || !email) {
+        setRepairError('Please fill all required fields');
+        return;
+      }
+
+      try {
+        const fileUploadPromises: Promise<AxiosResponse<any>>[] = [];
+        fileUploadPromises.push(uploadFile(data.ontology1));
+        fileUploadPromises.push(uploadFile(data.ontology2));
+        fileUploadPromises.push(uploadFile(data.alignId));
+        fileUploadPromises.push(uploadFile(data.refId));
+
+        const [ontology1Result, ontology2Result, alignIdResult, refIdResult] = await Promise.all(fileUploadPromises);
+  
+        const repairData: RepairRequest = {
+          ontologyId1: ontology1Result.data.fileName,
+          ontologyId2: ontology2Result.data.fileName,
+          alignId: alignIdResult.data.fileName,
+          refId: refIdResult.data.fileName || '',
+          service: service,
+          email: email
+        }
+  
+        const resRepair = await repair(repairData);
+  
+        setRepairResponse(resRepair.data);
+        setShowModal(true)
+        intervalIdRef.current = setInterval(() => fetchData(resRepair.data.requestId), 2000);
+      } catch (err) {
+        console.log(err);
+        setRepairError('Something went wrong');
+      }
     }
+
+
+    
   }
 
   return (
